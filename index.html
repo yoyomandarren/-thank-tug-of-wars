@@ -3,116 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>雙向感恩拔河 - 可運行版本</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
-
-<style>
-body { font-family: 'Noto Sans TC', sans-serif; background-color: #f8fafc; }
-.rope-texture {
-  background-image: repeating-linear-gradient(45deg,#78350f,#78350f 12px,#92400e 12px,#92400e 24px);
-  box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
-}
-.knot-container { transition: left 0.5s cubic-bezier(0.34,1.56,0.64,1); }
-#knot { transition: left 0.5s ease; }
-.animate-pull-red { animation: pull-left 0.4s ease-out; }
-.animate-pull-blue { animation: pull-right 0.4s ease-out; }
-@keyframes pull-left { 50% { transform: scale(1.1) translateX(-10px); } }
-@keyframes pull-right { 50% { transform: scale(1.1) translateX(10px); } }
-.victory-gradient { background: linear-gradient(135deg,#f59e0b 0%,#fbbf24 100%); }
-</style>
+<title>拔河測試版</title>
 </head>
+<body>
 
-<body class="min-h-screen flex items-center justify-center p-4">
+<h1>雙向拔河測試</h1>
 
-<div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden border-8 border-slate-100 relative">
-
-<!-- 標題 -->
-<div class="bg-slate-800 p-4 text-center text-white font-bold text-2xl">❤️ 感恩拔河 💙</div>
-
-<!-- 拔河繩 -->
-<div class="bg-slate-50 p-6">
-  <div class="relative h-32 flex items-center">
-    <div class="w-full h-6 rope-texture rounded-full relative">
-      <div id="knot" class="absolute top-1/2 -translate-y-1/2 w-12 h-12 bg-red-500 rounded rotate-45 text-white flex items-center justify-center font-bold" style="left:50%; transform:translate(-50%,-50%) rotate(45deg);">感恩</div>
-    </div>
-  </div>
+<div>
+  <h2>紅隊 ❤️</h2>
+  <p id="text-red">點擊抽題</p>
+  <button onclick="draw('red')">抽題</button>
+  <button onclick="pull('red')" id="pull-red" style="display:none;">拉！</button>
+  分數：<span id="score-red">0</span>
 </div>
 
-<!-- 操作面板 -->
-<div class="grid md:grid-cols-2">
-
-  <!-- 紅隊 -->
-  <div class="p-4 text-center">
-    <h2 class="text-red-500 font-bold mb-2">紅隊 ❤️</h2>
-    <p id="text-red" class="mb-2">點擊抽題</p>
-    <button onclick="draw('red')" class="bg-red-500 text-white px-4 py-2 rounded mb-2">抽題</button><br>
-    <button onclick="pull('red')" id="pull-red" class="hidden bg-red-700 text-white px-4 py-2 rounded">拉！</button>
-    <div class="mt-2">分數：<span id="score-red">0</span></div>
-  </div>
-
-  <!-- 藍隊 -->
-  <div class="p-4 text-center">
-    <h2 class="text-blue-500 font-bold mb-2">藍隊 💙</h2>
-    <p id="text-blue" class="mb-2">點擊抽題</p>
-    <button onclick="draw('blue')" class="bg-blue-500 text-white px-4 py-2 rounded mb-2">抽題</button><br>
-    <button onclick="pull('blue')" id="pull-blue" class="hidden bg-blue-700 text-white px-4 py-2 rounded">拉！</button>
-    <div class="mt-2">分數：<span id="score-blue">0</span></div>
-  </div>
-
+<div>
+  <h2>藍隊 💙</h2>
+  <p id="text-blue">點擊抽題</p>
+  <button onclick="draw('blue')">抽題</button>
+  <button onclick="pull('blue')" id="pull-blue" style="display:none;">拉！</button>
+  分數：<span id="score-blue">0</span>
 </div>
 
-<!-- 勝利視窗 -->
-<div id="winner-modal" class="hidden fixed inset-0 bg-slate-900/90 z-50 flex items-center justify-center p-4">
-  <div class="victory-gradient p-1 rounded-3xl shadow-2xl max-w-sm w-full">
-    <div class="bg-white rounded-2xl p-8 text-center">
-      <div class="text-6xl mb-4">🏆</div>
-      <h2 id="win-text" class="text-3xl font-black mb-4">紅隊獲勝</h2>
-      <button onclick="location.reload()" class="w-full bg-slate-800 text-white py-2 rounded font-bold hover:bg-slate-700 transition">重新開始</button>
-    </div>
-  </div>
+<div>
+  <p id="winner"></p>
 </div>
 
 <script>
-const questions = [
-  "感謝今天的一件小事","感謝一個人","最近讓你開心的事","你覺得幸運的一件事",
-  "感謝身邊的朋友","感謝自己的努力","分享一個最近學會的新技能"
-];
-
-let rope = 50; // 繩子位置 0-100
+let rope = 50;
 let scoreRed = 0;
 let scoreBlue = 0;
 const STRENGTH = 10;
+const questions = ["感謝今天的小事", "感謝朋友", "最近讓你開心的事"];
 
 function draw(team){
   const q = questions[Math.floor(Math.random()*questions.length)];
   document.getElementById("text-"+team).innerText = "「"+q+"」";
-  document.getElementById("pull-"+team).classList.remove("hidden");
+  document.getElementById("pull-"+team).style.display = "inline";
 }
 
 function pull(team){
   if(team==="red"){ rope -= STRENGTH; scoreRed++; document.getElementById("score-red").innerText=scoreRed; }
   else { rope += STRENGTH; scoreBlue++; document.getElementById("score-blue").innerText=scoreBlue; }
 
-  if(rope<0) rope=0; if(rope>100) rope=100;
+  document.getElementById("pull-red").style.display = "none";
+  document.getElementById("pull-blue").style.display = "none";
 
-  document.getElementById("knot").style.left = rope + "%";
-
-  document.getElementById("pull-red").classList.add("hidden");
-  document.getElementById("pull-blue").classList.add("hidden");
-
-  document.getElementById("text-red").innerText = "完成一次分享！";
-  document.getElementById("text-blue").innerText = "完成一次分享！";
-
-  if(rope<=10){ showWinner("紅隊"); }
-  if(rope>=90){ showWinner("藍隊"); }
-}
-
-function showWinner(team){
-  document.getElementById("winner-modal").classList.remove("hidden");
-  document.getElementById("win-text").innerText = team + " 獲勝！";
-  document.getElementById("win-text").style.color = team==="紅隊"?"#ef4444":"#3b82f6";
+  if(rope<=10){ document.getElementById("winner").innerText="紅隊獲勝！"; }
+  if(rope>=90){ document.getElementById("winner").innerText="藍隊獲勝！"; }
 }
 </script>
 
